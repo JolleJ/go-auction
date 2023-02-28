@@ -12,22 +12,11 @@ import "time"
 	Status		AuctionStatus	- Status of the auction
 	Bids 		[]Bid			- List of bids on the auction
 
-	type AuctionStatus string
 
-	const (
-		AuctionStatusActive   AuctionStatus = "active"
-		AuctionStatusEnded    AuctionStatus = "ended"
-	)
-
-
-	BID STRUCT
-	id
-	auctionId
-	userId
-	amount
-	time
 
 */
+
+var auctions []Auction
 
 type AuctionStatus string
 
@@ -44,4 +33,27 @@ type Auction struct {
 	EndTime    time.Time     `json:"endTime"`
 	Status     AuctionStatus `json:"auctionStatus"`
 	Bids       []Bid         `josn:"bids"`
+}
+
+func init() {
+	auctions = append(auctions, Auction{Id: "1", ItemId: "1", StartPrice: 100, StartTime: time.Now(), EndTime: time.Now().Add(time.Hour), Status: AuctionStatusActive})
+}
+
+func ListAuctions() []Auction {
+	return auctions
+}
+
+func GetAuction(id string) Auction {
+
+	for _, auction := range auctions {
+		if auction.Id == id {
+			return auction
+		}
+	}
+
+	return Auction{}
+}
+
+func AddAuction(auction Auction) {
+	auctions = append(auctions, auction)
 }

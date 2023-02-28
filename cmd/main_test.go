@@ -1,39 +1,16 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
+
+	"github.com/jollej/go-auction/pgm/models"
 )
-
-/*
-	ITEM STRUCT
-
-	id 						- Id of auction
-	itemId 					- Id of item being auctioned
-	latestBid (timestamp)	- Timestamp of latestBid
-	startPrice	float64		- Price where bidding starts at
-	startTime
-	endTime
-	Status					- Auctionstatus
-	Bids 					- List of bids on the auction
-
-	type AuctionStatus string
-
-	const (
-		AuctionStatusActive   AuctionStatus = "active"
-		AuctionStatusEnded    AuctionStatus = "ended"
-	)
-
-
-	BID STRUCT
-	id
-	auctionId
-	userId
-	amount
-	time
-
-*/
 
 // executeRequest, creates a new ResponseRecorder
 // then executes the request by calling ServeHTTP in the router
@@ -55,7 +32,7 @@ func checkResponseCode(t *testing.T, expected, actual int) {
 }
 
 //Should return all active auctions
-func TestlistActiveAuctions(t *testing.T) {
+func TestListActiveAuctions(t *testing.T) {
 	s := CreateNewServer()
 	s.MountHandlers()
 
@@ -63,5 +40,32 @@ func TestlistActiveAuctions(t *testing.T) {
 
 	respose := executeRequest(req, s)
 
+	checkResponseCode(t, http.StatusOK, respose.Code)
+}
+
+func TestGetAuction(t *testing.T) {
+	s := CreateNewServer()
+	s.MountHandlers()
+
+	req, _ := http.NewRequest("GET", "/auctions/1", nil)
+
+	respose := executeRequest(req, s)
+
+	checkResponseCode(t, http.StatusOK, respose.Code)
+}
+
+func TestAddAuction(t *testing.T) {
+	s := CreateNewServer()
+	s.MountHandlers()
+
+	auction := &models.Auction{Id: "1", ItemId: "1", StartPrice: 100, StartTime: time.Now(), EndTime: time.Now().Add(time.Hour), Status: models.AuctionStatusActive}
+	auctionJson, err := json.Marshal(auction)
+	jsonRequest := bytes.NewReader(auctionJson)
+
+	if err != nil {
+		log.Panic(err)
+	}
+	req, _ := http.NewRequest("POST", "/auctions", jsonRequest)
+	respose := executeRequest(req, s)
 	checkResponseCode(t, http.StatusOK, respose.Code)
 }

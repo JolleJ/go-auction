@@ -1,8 +1,11 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jollej/go-auction/pgm/routes"
 )
 
 type Server struct {
@@ -21,9 +24,12 @@ func (s *Server) MountHandlers() {
 	s.Router.Use(middleware.Recoverer)
 	//s.Router.Use(middleware.AllowContentType("application/json"))
 	//routes.RegisterItemRoutes(s.Router)
+	routes.RegisterAuctionRoutes(s.Router)
 	//Mound rest of the handlers here
 }
 
 func main() {
-
+	s := CreateNewServer()
+	s.MountHandlers()
+	http.ListenAndServe(":9090", s.Router)
 }
