@@ -69,3 +69,60 @@ func TestAddAuction(t *testing.T) {
 	respose := executeRequest(req, s)
 	checkResponseCode(t, http.StatusOK, respose.Code)
 }
+
+func TestGetItems(t *testing.T) {
+	// Create a New Server Struct
+	s := CreateNewServer()
+	// Mount Handlers
+	s.MountHandlers()
+
+	// Create a New Request
+	req, _ := http.NewRequest("GET", "/items", nil)
+
+	// Execute Request
+	response := executeRequest(req, s)
+
+	// Check the response code
+	checkResponseCode(t, http.StatusOK, response.Code)
+
+}
+
+func TestGetItem(t *testing.T) {
+	// Create a New Server Struct
+	s := CreateNewServer()
+	// Mount Handlers
+	s.MountHandlers()
+
+	// Create a New Request
+	req, _ := http.NewRequest("GET", "/items/1", nil)
+
+	// Execute Request
+	response := executeRequest(req, s)
+	// Check the response code
+	checkResponseCode(t, http.StatusOK, response.Code)
+}
+
+func TestCreateItem(t *testing.T) {
+	s := CreateNewServer()
+	s.MountHandlers()
+
+	item := &models.Item{Id: "3", Description: "Item from test", Category: "Test_category"}
+	itemJson, err := json.Marshal(item)
+	jsonRequest := bytes.NewReader(itemJson)
+
+	if err != nil {
+		log.Panic(err)
+	}
+	req, _ := http.NewRequest("POST", "/items", jsonRequest)
+	response := executeRequest(req, s)
+	checkResponseCode(t, http.StatusOK, response.Code)
+}
+
+func TestDeleteItem(t *testing.T) {
+	s := CreateNewServer()
+	s.MountHandlers()
+
+	req, _ := http.NewRequest(http.MethodDelete, "/items/2", nil)
+	response := executeRequest(req, s)
+	checkResponseCode(t, http.StatusOK, response.Code)
+}

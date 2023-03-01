@@ -23,8 +23,8 @@ func (s *Server) MountHandlers() {
 	s.Router.Use(middleware.Logger)
 	s.Router.Use(middleware.Recoverer)
 	//s.Router.Use(middleware.AllowContentType("application/json"))
-	//routes.RegisterItemRoutes(s.Router)
 	routes.RegisterAuctionRoutes(s.Router)
+	routes.RegisterItemRoutes(s.Router)
 	//Mound rest of the handlers here
 }
 
