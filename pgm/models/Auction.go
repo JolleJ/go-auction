@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 /*
 	ITEM STRUCT
@@ -56,4 +59,19 @@ func GetAuction(id string) Auction {
 
 func AddAuction(auction Auction) {
 	auctions = append(auctions, auction)
+}
+
+func AddBidd(bid Bid, itemId string) (bool, error) {
+	for _, auction := range auctions {
+		if auction.Id == itemId {
+
+			//Validate that the bid is higher than the current one
+			//If current bid is higher or if a newer bid has been placed before the request has been processed, return error.
+			if auction.Bids[len(auction.Bids)-1].Amount >= bid.Amount || auction.Bids[len(auction.Bids)-1].Time.After(bid.Time) {
+				return false, errors.New("Bid is not valid, too low amount of newer bid has been placed.")
+			}
+			auction.Bids = append(auction.Bids, bid)
+		}
+	}
+
 }
